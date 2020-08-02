@@ -1,6 +1,8 @@
 package com.example.android.fact_check;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     private static final String TAG = "RecyclerViewAdapter";
     Context context;
     ArrayList<ModelClass> models;
+    View view;
 
     public RecyclerViewAdapter(Context context, ArrayList<ModelClass> models) {
         this.context = context;
@@ -24,17 +27,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     @NonNull
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_layout, null);
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_layout, null);
+
         return new MyHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyHolder holder, final int position) {
         holder.mClaim.setText(models.get(position).getClaim());
         holder.mClaimant.setText(models.get(position).getClaimant());
         holder.mReview.setText(models.get(position).getReview());
 //        holder.mImageView.setImageResource(models.get(position).getImg());
-        GlideApp.with(context).asBitmap().load(models.get(position).getImageUrl().get(position)).into(holder.mImageView);
+        GlideApp.with(context).asBitmap().load(models.get(position).getImageUrl()).into(holder.mImageView);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(models.get(position).getImageUrl()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

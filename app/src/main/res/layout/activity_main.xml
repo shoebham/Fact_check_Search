@@ -22,11 +22,6 @@
         android:layout_height="wrap_content"
         android:text="search" />
 
-    <TextView
-        android:id="@+id/tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

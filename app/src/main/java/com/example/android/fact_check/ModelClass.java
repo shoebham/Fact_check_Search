@@ -6,13 +6,13 @@ import java.util.ArrayList;
 
 public class ModelClass {
     private String claim, claimant, review;
-    private ArrayList<String> imageUrl;
+    private String imageUrl;
 
-    public ArrayList<String> getImageUrl() {
+    public String getImageUrl() {
         return imageUrl;
     }
 
-    public void setImageUrl(ArrayList<String> imageUrl) {
+    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 

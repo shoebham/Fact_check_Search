@@ -28,6 +28,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -48,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,20 +69,9 @@ public class MainActivity extends AppCompatActivity {
     public RecyclerView recyclerView;
     public RecyclerViewAdapter recyclerViewAdapter;
     public ArrayList<String> imageUrl;
-    //    public ArrayList<Map> claims;
-//    public Map<String,String> responseBody;
-//    public Map<String,String> text;
-//    public Map<String,String> claimant;
-//    public Map<String,String> claimDate;
-//    public ArrayList<Map> claimReview;
-//    public Map<String,ArrayList> publisher;
-//    public ArrayList<Map> publisherInfo;
-//    public Map<String,String> name;
-//    public Map<String,String> site;
-//    public Map<String,String> url;
-//    public Map<String,String> title;
-//    public Map<String,String> textualRating;
-//    public Map<String,String> languageCode;
+    public JSONArray jsonArray = new JSONArray();
+    public JSONObject jsonObject = new JSONObject();
+    public Gson gson = new Gson();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,27 +89,11 @@ public class MainActivity extends AppCompatActivity {
                 sendData();
             }
         });
-
-//        cardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(search.claims.get(0).claimReview.get(0).url));
-//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                getApplicationContext().startActivity(intent);
-//            }
-//        });
-
-
     }
-
-    public JSONArray jsonArray = new JSONArray();
-    public JSONObject jsonObject = new JSONObject();
-    public Gson gson = new Gson();
-
     public void sendData() {
         RequestQueue queue = Volley.newRequestQueue(this);
         String search_text = EditText.getText().toString();
-        String url = "https://factchecktools.googleapis.com/v1alpha1/claims:search?query=" + search_text + "&key=AIzaSyB2Krqs92spjiNKQL9NApU6uykAWVyBtcE";
+        String url = "https://factchecktools.googleapis.com/v1alpha1/claims:search?&query=" + search_text + "&key=AIzaSyB2Krqs92spjiNKQL9NApU6uykAWVyBtcE";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
@@ -127,13 +102,12 @@ public class MainActivity extends AppCompatActivity {
                         search = gson.fromJson(response.toString(), Search.class);
                         Log.i("response", search.toString());
                         new getImage().execute();
-
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.i("response", error.toString());// TODO: Handle error
-
+                        Toast.makeText(getApplicationContext(), "Some unexpected error occurred", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -173,58 +147,60 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewAdapter = new RecyclerViewAdapter(this, getMyList());
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(20);
+        recyclerView.setDrawingCacheEnabled(true);
+        recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     }
 
     private ArrayList<ModelClass> getMyList() {
         ArrayList<ModelClass> models = new ArrayList<>();
-
         for (int i = 0; i < search.claims.size(); i++) {
             ModelClass m = new ModelClass();
             m.setClaim("Claim:- " + search.claims.get(i).text);
             m.setClaimant("Claimant:- " + search.claims.get(i).claimant);
             m.setReview("Factual Rating:-" + search.claims.get(i).claimReview.get(0).textualRating);
-            m.setImageUrl(imageUrl);
+            m.setImageUrl(imageUrl.get(i));
             models.add(m);
 //            claim_text.setText("Claim:- " + search.claims.get(i).text);
 //            claimaint_text.setText("Claimant:- " + search.claims.get(i).claimant);
 //            review_text.setText("Factual Rating:-" + search.claims.get(i).claimReview.get(0).textualRating);
-
         }
         return models;
     }
 
-    private void update() {
-        claim_text.setText("Claim:- " + search.claims.get(0).text);
-        claimaint_text.setText("Claimant:- " + search.claims.get(0).claimant);
-        review_text.setText("Factual Rating:-" + search.claims.get(0).claimReview.get(0).textualRating);
-    }
-
+    long start;
     private class getImage extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
+            start = System.currentTimeMillis();
+            Log.i("response", "operation started");
             try {
                 imageUrl = new ArrayList<>();
                 for (int i = 0; i < search.claims.size(); i++) {
-                    document = Jsoup.connect(search.claims.get(i).claimReview.get(0).url).get();
+                    document = Jsoup.connect(search.claims.get(i).claimReview.get(0).url).userAgent("Mozilla")
+                            .cookie("auth", "token")
+                            .timeout(60000).get();
+                    //   Log.i("response", "document = "+document.toString());
                     img = document.select("meta[property=og:image]");
                     imgUrl = null;
                     if (img != null) {
                         imgUrl = img.attr("content");
                         Log.i("response", imgUrl);
-
                         imageUrl.add(imgUrl);
                     }
 
                 }
+                Log.i("response", "Operation took " + (System.currentTimeMillis() - start) / 1000 + " seconds");
             } catch (Exception e) {
                 e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Some unexpected error occurred", Toast.LENGTH_LONG).show();
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-//            GlideApp.with(getApplicationContext()).load(imgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
             initRecyclerView();
             super.onPostExecute(aVoid);
         }
