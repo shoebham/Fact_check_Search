@@ -1,85 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/text"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Some text"
-        android:padding="20dp"
-        android:layout_marginBottom="10dp" />
+        android:background="@color/material_on_surface_disabled">
 
-    <Button
-        android:layout_below="@+id/text"
-        android:id="@+id/button"
-        android:layout_gravity="right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="search" />
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-    <TextView
-        android:id="@+id/pageSize_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Result Size:"
-        android:layout_margin="10dp"
-        android:layout_toRightOf="@+id/button"
-        android:layout_below="@+id/text" />
+            <RelativeLayout
+                android:id="@+id/relative"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-    <EditText
-        android:id="@+id/pageSize"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:layout_below="@+id/text"
-        android:layout_toRightOf="@+id/pageSize_tv" />
+                <EditText
+                    android:id="@+id/search_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:drawableStart="@drawable/ic_search_black_24dp"
+                    android:hint=" Enter Some text"
+                    android:padding="20dp"
+                    android:singleLine="true" />
 
-    <ProgressBar
-        android:id="@+id/progressbar"
-        android:visibility="gone"
-        android:layout_below="@+id/button"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+                <ImageButton
+                    android:id="@+id/parameters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-50dp"
+                    android:layout_marginTop="7dp"
+                    android:layout_toEndOf="@+id/search_text"
+                    android:src="@drawable/parameters" />
 
-    <TextView
-        android:id="@+id/empty_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/button"
-        android:gravity="center"
-        android:text="It's Empty here.\n Search Something." />
+                <ProgressBar
+                    android:id="@+id/progressbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/search_text"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/invaild_search"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/button"
-        android:gravity="center"
-        android:text="Oops...\n your search did not match any claims" />
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:clipToPadding="false"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button"
-        android:padding="10dp"
-        android:layout_marginTop="10dp" />
+                <Button
+                    android:id="@+id/search_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/search_text"
+                    android:layout_alignEnd="@+id/search_text"
+                    android:layout_margin="5dp"
+                    android:text="search" />
+            </RelativeLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbarFadeDuration="2"
-        app:labelVisibilityMode="labeled"
-        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
-        app:menu="@menu/menu" />
-</RelativeLayout>
+    <include layout="@layout/scroll" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

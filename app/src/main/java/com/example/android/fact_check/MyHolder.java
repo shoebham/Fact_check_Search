@@ -17,6 +17,7 @@ public class MyHolder extends RecyclerView.ViewHolder {
         this.mClaim = itemView.findViewById(R.id.claim);
         this.mClaimant = itemView.findViewById(R.id.claimaint);
         this.mReview = itemView.findViewById(R.id.review);
+
     }
 
 

@@ -8,10 +8,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:strokeColor="@android:color/black"
     app:strokeWidth="2dp"
-    android:layout_marginBottom="4dp"
-    android:padding="10dp"
     android:hapticFeedbackEnabled="true"
-    app:cardElevation="50dp">
+
+    app:cardElevation="20dp"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:orientation="vertical"
@@ -35,6 +35,7 @@
                 android:fontFamily="sans-serif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 
             <TextView
@@ -47,21 +48,11 @@
             <TextView
                 android:id="@+id/review"
                 android:fontFamily="sans-serif"
-
                 android:layout_marginTop="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceBody2" />
         </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:gravity="right"
-            android:layout_gravity="right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Open site"
-            style="?attr/borderlessButtonStyle" />
-
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

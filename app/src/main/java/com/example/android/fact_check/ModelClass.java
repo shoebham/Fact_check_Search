@@ -1,12 +1,18 @@
 package com.example.android.fact_check;
 
-import android.widget.ImageView;
-
-import java.util.ArrayList;
-
 public class ModelClass {
     private String claim, claimant, review;
     private String imageUrl;
+    private String websiteUrl;
+
+    public String getWebsiteUrl() {
+        return websiteUrl;
+    }
+
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
+    }
+
 
     public String getImageUrl() {
         return imageUrl;

@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     private static final String TAG = "RecyclerViewAdapter";
@@ -30,7 +29,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_layout, null);
-
         return new MyHolder(view);
     }
 
@@ -38,17 +36,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     public void onBindViewHolder(@NonNull MyHolder holder, final int position) {
         RequestOptions myOptions = new RequestOptions()
                 .override(700, 700);
-
-
         holder.mClaim.setText(models.get(position).getClaim());
         holder.mClaimant.setText(models.get(position).getClaimant());
         holder.mReview.setText(models.get(position).getReview());
-//        holder.mImageView.setImageResource(models.get(position).getImg());
-        GlideApp.with(context).asBitmap().apply(myOptions).load(models.get(position).getImageUrl()).into(holder.mImageView);
+        long start = System.currentTimeMillis();
+        GlideApp.with(context).applyDefaultRequestOptions(myOptions).load(models.get(position).getImageUrl()).into(holder.mImageView);
+        long end = System.currentTimeMillis();
+
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(models.get(position).getImageUrl()));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(models.get(position).getWebsiteUrl()));
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }
