@@ -25,7 +25,7 @@
         android:text="It's Empty here.\n Search Something." />
 
     <TextView
-        android:id="@+id/invaild_search"
+        android:id="@+id/invalid_search"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"

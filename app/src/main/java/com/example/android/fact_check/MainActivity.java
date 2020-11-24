@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Fact Check Search");
-        website_url = new ArrayList<>();
+
         searchText = findViewById(R.id.search_text);
         error_text = findViewById(R.id.error_text);
         claim_text = findViewById(R.id.claim);
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         cardView = findViewById(R.id.card);
         progressBar = findViewById(R.id.progressbar);
         emptyText = findViewById(R.id.empty_text);
-        invalid_search = findViewById(R.id.invaild_search);
+        invalid_search = findViewById(R.id.invalid_search);
         recyclerView = findViewById(R.id.recycler_view);
         parameters = findViewById(R.id.parameters);
         long_time_text = findViewById(R.id.long_time_text);
@@ -114,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         Log.i("response", "intent get result " + resultSize);
+
+        //Search Bar OnClickListener which shows keyboard
         searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -144,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Sending Data to another activity
+    //Sending Data to settings activity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -211,13 +213,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     }
 
-    class claims {
-        private String text;
-        private String claimant;
-        private String claimDate;
-        private ArrayList<claimReview> claimReview;
-    }
-
     //filling recyclerView through modelClass
     private ArrayList<ModelClass> getMyList() {
         ArrayList<ModelClass> models = new ArrayList<>();
@@ -228,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
             m.setReview("Factual Rating:- " + search.claims.get(i).claimReview.get(0).textualRating);
             m.setImageUrl(imageUrl.get(i));
             m.setWebsiteUrl(website_url.get(i));
+            Log.i("response", "I am in getMyList() and website url is " + website_url);
             models.add(m);
 //            claim_text.setText("Claim:- " + search.claims.get(i).text);
 //            claimant_text.setText("Claimant:- " + search.claims.get(i).claimant);
@@ -236,10 +232,19 @@ public class MainActivity extends AppCompatActivity {
         return models;
     }
 
+    //claims class
+    class claims {
+        private String text;
+        private String claimant;
+        private String claimDate;
+        private ArrayList<claimReview> claimReview;
+    }
+
     class publisher {
         private String name;
         private String site;
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -261,8 +266,11 @@ public class MainActivity extends AppCompatActivity {
         private String languageCode;
     }
 
+    //This is where the most of the work of the App is done
     //getting Image by scraping image from the url
     private class getImage extends AsyncTask<Void, Void, Void> {
+
+        //Background Thread that connects to the website and searches for image url
         @SuppressLint("WrongThread")
         @Override
         protected Void doInBackground(Void... voids) {
@@ -270,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("response", "operation started");
             try {
                 imageUrl = new ArrayList<>();
+                website_url = new ArrayList<>();
 //                OkHttpClient okHttpClient = new OkHttpClient.Builder()
 //                        .connectTimeout(30,TimeUnit.SECONDS)
 //                        .readTimeout(30, TimeUnit.SECONDS)
@@ -303,13 +312,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     imgUrl = null;
-                    Log.i("response", i + "");
+
                     if (img != null) {
+                        Log.i("response", i + "");
                         imgUrl = img.attr("content");
-                        website_url.add(search.claims.get(i).claimReview.get(0).url);
+
                         Log.i("response", "url of website :- " + search.claims.get(i).claimReview.get(0).url);
                         Log.i("response", "url of image :- " + imgUrl);
                         imageUrl.add(imgUrl);
+                        website_url.add(search.claims.get(i).claimReview.get(0).url);
                     }
                     publishProgress();
                 }
@@ -326,6 +337,7 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
+        //If connection takes too long displays a toast
         @Override
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
@@ -335,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
             initRecyclerView();
         }
 
+        //This executes after background thread finishes its task
         @Override
         protected void onPostExecute(Void aVoid) {
             try {
