@@ -15,7 +15,6 @@
 
         <activity
             android:name=".SplashScreenActivity"
-            android:configChanges="screenLayout|orientation|screenSize"
             android:theme="@style/splashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,7 +31,6 @@
         </activity>
         <activity
             android:name=".parameters"
-            android:configChanges="screenLayout|orientation|screenSize"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

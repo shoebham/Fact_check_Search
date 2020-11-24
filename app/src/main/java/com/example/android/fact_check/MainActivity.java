@@ -1,11 +1,15 @@
 package com.example.android.fact_check;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -70,20 +74,16 @@ public class MainActivity extends AppCompatActivity {
     private OkHttpClient okHttpClient;
     private TextView long_time_text;
     private long connection_time_start, connection_time_end;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        try {
-//            setTheme(R.style.AppTheme);
-//            Thread.sleep(3000);
-//        }catch (Exception e){e.printStackTrace();}
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setTitle("Fact Check Search");
         website_url = new ArrayList<>();
         searchText = findViewById(R.id.search_text);
         error_text = findViewById(R.id.error_text);
         claim_text = findViewById(R.id.claim);
-        claimant_text = findViewById(R.id.claimaint);
+        claimant_text = findViewById(R.id.claimant);
         review_text = findViewById(R.id.review);
         button = findViewById(R.id.search_button);
         imageView = findViewById(R.id.image);
@@ -94,22 +94,12 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         parameters = findViewById(R.id.parameters);
         long_time_text = findViewById(R.id.long_time_text);
-        //Search Button onClickListener
 
+        //Search Button onClickListener
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!searchText.getText().toString().equals("")) {
-                    sendData();
-                    start = System.currentTimeMillis();
-                    recyclerView.setVisibility(View.GONE);
-                    emptyText.setVisibility(View.GONE);
-                    invalid_search.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.VISIBLE);
-                    Toast.makeText(getApplicationContext(), "Loading...\n please wait...", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Enter Some Text", Toast.LENGTH_SHORT).show();
-                }
+                showAndHideThingsOnSearch();
             }
         });
 
@@ -123,10 +113,36 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, 1);
             }
         });
-        Log.i("response", "intent get result" + resultSize);
+        Log.i("response", "intent get result " + resultSize);
+        searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_SEARCH) {
+                    showAndHideThingsOnSearch();
+                    searchText.clearFocus();
+                    InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    in.hideSoftInputFromWindow(searchText.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        });
 
     }
 
+    protected void showAndHideThingsOnSearch() {
+        if (!searchText.getText().toString().equals("")) {
+            sendData();
+            start = System.currentTimeMillis();
+            recyclerView.setVisibility(View.GONE);
+            emptyText.setVisibility(View.GONE);
+            invalid_search.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            Toast.makeText(getApplicationContext(), "Loading...\n Please wait...", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Enter Some Text", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     //Sending Data to another activity
     @Override
@@ -148,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
             Log.i("response", "intent get result " + resultSize);
             RequestQueue queue = Volley.newRequestQueue(this);
             String search_text = searchText.getText().toString();
-            String url = "https://factchecktools.googleapis.com/v1alpha1/claims:search?languageCode=" + language + "&pageSize=" + resultSize + "&query=" + search_text + "&key=AIzaSyB2Krqs92spjiNKQL9NApU6uykAWVyBtcE";
+            String API_KEY = "AIzaSyB2Krqs92spjiNKQL9NApU6uykAWVyBtcE";
+            String url = "https://factchecktools.googleapis.com/v1alpha1/claims:search?languageCode=" + language + "&pageSize=" + resultSize + "&query=" + search_text + "&key=" + API_KEY;
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                         @Override
@@ -171,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
                             error.printStackTrace();
                             progressBar.setVisibility(View.GONE);
                             error_text.setVisibility(View.VISIBLE);
+
                             Toast.makeText(getApplicationContext(), "Some unexpected error occurred", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -183,8 +201,6 @@ public class MainActivity extends AppCompatActivity {
 
     //initialise recyclerView
     private void initRecyclerView() {
-
-
         recyclerView.setVisibility(View.VISIBLE);
         recyclerViewAdapter = new RecyclerViewAdapter(this, getMyList());
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -209,12 +225,12 @@ public class MainActivity extends AppCompatActivity {
             ModelClass m = new ModelClass();
             m.setClaim("Claim:- " + search.claims.get(i).text);
             m.setClaimant("Claimant:- " + search.claims.get(i).claimant);
-            m.setReview("Factual Rating:-" + search.claims.get(i).claimReview.get(0).textualRating);
+            m.setReview("Factual Rating:- " + search.claims.get(i).claimReview.get(0).textualRating);
             m.setImageUrl(imageUrl.get(i));
             m.setWebsiteUrl(website_url.get(i));
             models.add(m);
 //            claim_text.setText("Claim:- " + search.claims.get(i).text);
-//            claimaint_text.setText("Claimant:- " + search.claims.get(i).claimant);
+//            claimant_text.setText("Claimant:- " + search.claims.get(i).claimant);
 //            review_text.setText("Factual Rating:-" + search.claims.get(i).claimReview.get(0).textualRating);
         }
         return models;
@@ -224,7 +240,6 @@ public class MainActivity extends AppCompatActivity {
         private String name;
         private String site;
     }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -263,6 +278,9 @@ public class MainActivity extends AppCompatActivity {
 //                        .protocols(Collections.singletonList(Protocol.HTTP_1_1))
 //                        .build();
                 for (int i = 0; i < search.claims.size(); i++) {
+                    if (isCancelled()) {
+                        break;
+                    }
 //                        okhttp3.Request request = new okhttp3.Request.Builder()
 //                                .url(search.claims.get(i).claimReview.get(0).url)
 //                                .build();

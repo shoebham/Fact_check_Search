@@ -1,6 +1,5 @@
 package com.example.android.fact_check;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,10 +11,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
-public class parameters extends Activity {
+public class parameters extends AppCompatActivity {
     public String language, result_size;
     private ArrayList<String> languages = new ArrayList<String>();
     private ArrayList<String> languageCode = new ArrayList<String>();
