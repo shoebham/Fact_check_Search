@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("response", "intent get result " + resultSize);
             RequestQueue queue = Volley.newRequestQueue(this);
             String search_text = searchText.getText().toString();
-            String API_KEY = "AIzaSyB2Krqs92spjiNKQL9NApU6uykAWVyBtcE";
+            String API_KEY = getString(R.string.api_key);
             String url = "https://factchecktools.googleapis.com/v1alpha1/claims:search?languageCode=" + language + "&pageSize=" + resultSize + "&query=" + search_text + "&key=" + API_KEY;
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
