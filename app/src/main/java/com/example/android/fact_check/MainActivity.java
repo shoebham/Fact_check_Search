@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setVisibility(View.GONE);
             emptyText.setVisibility(View.GONE);
             invalid_search.setVisibility(View.GONE);
+            error_text.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             Toast.makeText(getApplicationContext(), "Loading...\n Please wait...", Toast.LENGTH_SHORT).show();
         } else {
