@@ -30,7 +30,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.android.fact_check.adapter.models.HorizontalModel;
 import com.example.android.fact_check.adapter.models.VerticalModel;
 import com.example.android.fact_check.adapter.outerAdapter;
 import com.google.android.material.card.MaterialCardView;
@@ -80,13 +79,17 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<VerticalModel> arrayList;
     RecyclerView verticalRecyclerView;
     outerAdapter adapter;
+    public ArrayList<String> searchHistory;
+    public ArrayList<ArrayList<ModelClass>> supermodel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Fact Check Search");
+        searchHistory = new ArrayList<>();
         arrayList = new ArrayList<>();
+        supermodel = new ArrayList<ArrayList<ModelClass>>();
         searchText = findViewById(R.id.search_text);
         error_text = findViewById(R.id.error_text);
         claim_text = findViewById(R.id.claim);
@@ -101,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         parameters = findViewById(R.id.parameters);
         long_time_text = findViewById(R.id.long_time_text);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         //Search Button onClickListener
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -174,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("response", "intent get result " + resultSize);
             RequestQueue queue = Volley.newRequestQueue(this);
             String search_text = searchText.getText().toString();
+            searchHistory.add(search_text);
             String API_KEY = getString(R.string.api_key);
             String url = "https://factchecktools.googleapis.com/v1alpha1/claims:search?languageCode=" + language + "&pageSize=" + resultSize + "&query=" + search_text + "&key=" + API_KEY;
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -212,20 +215,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         Log.v("Recycler", "214");
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
+        supermodel.add(getMyList());
         recyclerView.setVisibility(View.VISIBLE);
-        recyclerView.setAdapter(new outerAdapter(getApplicationContext(), getMyList()));
+        recyclerView.setAdapter(new outerAdapter(getApplicationContext(), supermodel, getMyList(), searchHistory));
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(20);
         recyclerView.setDrawingCacheEnabled(true);
         recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-    }
-
-    private void setData() {
-        VerticalModel verticalModel = new VerticalModel();
-        ArrayList<HorizontalModel> arrayListHorizontal = new ArrayList<>();
-//        verticalModel.setArrayList(getMyList());
-        arrayList.add(verticalModel);
-        adapter.notifyDataSetChanged();
     }
 
     //filling recyclerView through modelClass

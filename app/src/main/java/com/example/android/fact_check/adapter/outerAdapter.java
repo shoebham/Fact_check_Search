@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,11 +19,15 @@ import java.util.ArrayList;
 public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> {
     Context context;
     ArrayList<ModelClass> models;
+    ArrayList<String> searchHistory;
+    ArrayList<ArrayList<ModelClass>> supermodel;
 
-    public outerAdapter(Context context, ArrayList<ModelClass> models) {
+    public outerAdapter(Context context, ArrayList<ArrayList<ModelClass>> supermodel, ArrayList<ModelClass> models, ArrayList<String> searchHistory) {
         Log.v("Recycler", models.get(0).getClaim());
         this.context = context;
         this.models = models;
+        this.searchHistory = searchHistory;
+        this.supermodel = supermodel;
     }
 
     @NonNull
@@ -36,22 +41,37 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull outerAdapter.ViewHolder holder, int position) {
-        holder.recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        if (position == 0)
-            holder.recyclerView.setAdapter(new innerAdapter(context, models));
+        Log.v("recycler", "size:" + searchHistory.size());
+        for (int i = 0; i <= searchHistory.size(); i++) {
+            if (position == searchHistory.size() - 1 - i) {
+                final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+                layoutManager.setMeasurementCacheEnabled(false);
+                holder.recyclerView.setLayoutManager(layoutManager);
+                holder.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        layoutManager.requestLayout();
+                    }
+                });
+                holder.recyclerView.setAdapter(new innerAdapter(context, supermodel.get(i)));
+                holder.textView.setText(searchHistory.get(i));
+            }
+        }
     }
 
     @Override
     public int getItemCount() {
-        return models.size();
+        return searchHistory.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         RecyclerView recyclerView;
-
+        TextView textView;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             recyclerView = itemView.findViewById(R.id.outer_recycler);
+            textView = itemView.findViewById(R.id.search_text);
         }
     }
 
