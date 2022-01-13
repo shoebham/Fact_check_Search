@@ -1,5 +1,7 @@
 package com.example.android.fact_check;
 
+import static org.junit.Assert.assertEquals;
+
 import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -7,8 +9,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -24,4 +24,13 @@ public class ExampleInstrumentedTest {
 
         assertEquals("com.example.android.fact_check", appContext.getPackageName());
     }
+
+    /* TODO
+     *   Tests for
+     *   Nested RecyclerView
+     *
+     *
+     *
+     * */
+
 }

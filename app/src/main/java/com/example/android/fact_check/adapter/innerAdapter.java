@@ -1,49 +1,54 @@
-package com.example.android.fact_check;
+package com.example.android.fact_check.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.request.RequestOptions;
+import com.example.android.fact_check.GlideApp;
+import com.example.android.fact_check.ModelClass;
+import com.example.android.fact_check.R;
 
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
-    private static final String TAG = "RecyclerViewAdapter";
-    Context context;
+public class innerAdapter extends RecyclerView.Adapter<innerAdapter.ViewHolder> {
+
     ArrayList<ModelClass> models;
     View view;
+    Context context;
 
-    public RecyclerViewAdapter(Context context, ArrayList<ModelClass> models) {
+    public innerAdapter(Context context, ArrayList<ModelClass> models) {
         this.context = context;
         this.models = models;
     }
 
     @NonNull
     @Override
-    public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_layout, null);
-        return new MyHolder(view);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.inner_recyclerview, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyHolder holder, @SuppressLint("RecyclerView") final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
+        holder.mClaim.setText(models.get(position).getClaim());
+        Log.v("Recycler", "45" + models.get(position).getClaim());
+        holder.mReview.setText(models.get(position).getReview());
         RequestOptions myOptions = new RequestOptions()
                 .override(700, 700);
-        holder.mClaim.setText(models.get(position).getClaim());
-        holder.mClaimant.setText(models.get(position).getClaimant());
-        holder.mReview.setText(models.get(position).getReview());
         long start = System.currentTimeMillis();
         GlideApp.with(context).applyDefaultRequestOptions(myOptions).load(models.get(position).getImageUrl()).into(holder.mImageView);
         long end = System.currentTimeMillis();
-
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,10 +65,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView mImageView;
+        TextView mClaim, mReview;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            mImageView = itemView.findViewById(R.id.image);
+            mClaim = itemView.findViewById(R.id.claim);
+            mReview = itemView.findViewById(R.id.review);
         }
-
-
     }
 }

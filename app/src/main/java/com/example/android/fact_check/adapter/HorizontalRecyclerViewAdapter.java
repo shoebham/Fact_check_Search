@@ -1,4 +1,4 @@
-package com.example.android.fact_check;
+package com.example.android.fact_check.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,16 +12,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.request.RequestOptions;
+import com.example.android.fact_check.GlideApp;
+import com.example.android.fact_check.R;
+import com.example.android.fact_check.adapter.models.HorizontalModel;
+import com.example.android.fact_check.adapter.models.MyHolder;
 
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
+public class HorizontalRecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     private static final String TAG = "RecyclerViewAdapter";
+    public int i = 0;
     Context context;
-    ArrayList<ModelClass> models;
+    ArrayList<HorizontalModel> models;
     View view;
 
-    public RecyclerViewAdapter(Context context, ArrayList<ModelClass> models) {
+    public HorizontalRecyclerViewAdapter(Context context, ArrayList<HorizontalModel> models) {
         this.context = context;
         this.models = models;
     }
@@ -29,7 +34,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     @NonNull
     @Override
     public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_layout, null);
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_layout, parent, false);
         return new MyHolder(view);
     }
 
@@ -38,6 +43,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
         RequestOptions myOptions = new RequestOptions()
                 .override(700, 700);
         holder.mClaim.setText(models.get(position).getClaim());
+//        holder.mClaim.setText(i++);
         holder.mClaimant.setText(models.get(position).getClaimant());
         holder.mReview.setText(models.get(position).getReview());
         long start = System.currentTimeMillis();
@@ -61,7 +67,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(@NonNull View itemView) {
+
             super(itemView);
+
         }
 
 

@@ -30,6 +30,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.android.fact_check.adapter.models.HorizontalModel;
+import com.example.android.fact_check.adapter.models.VerticalModel;
+import com.example.android.fact_check.adapter.outerAdapter;
 import com.google.android.material.card.MaterialCardView;
 import com.google.gson.Gson;
 
@@ -74,12 +77,16 @@ public class MainActivity extends AppCompatActivity {
     private OkHttpClient okHttpClient;
     private TextView long_time_text;
     private long connection_time_start, connection_time_end;
+    public ArrayList<VerticalModel> arrayList;
+    RecyclerView verticalRecyclerView;
+    outerAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Fact Check Search");
-
+        arrayList = new ArrayList<>();
         searchText = findViewById(R.id.search_text);
         error_text = findViewById(R.id.error_text);
         claim_text = findViewById(R.id.claim);
@@ -94,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         parameters = findViewById(R.id.parameters);
         long_time_text = findViewById(R.id.long_time_text);
-
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         //Search Button onClickListener
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Enter Some Text", Toast.LENGTH_SHORT).show();
         }
     }
-
     //Sending Data to settings activity
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -159,8 +166,8 @@ public class MainActivity extends AppCompatActivity {
             Log.i("response", "intent get result " + resultSize);
         }
     }
-
     //sending data to the API
+
     public void sendData() {
         try {
             Log.i("response", "intent get result " + language);
@@ -201,17 +208,24 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Your search did not match any claims", Toast.LENGTH_SHORT).show();
         }
     }
-
     //initialise recyclerView
+
     private void initRecyclerView() {
+        Log.v("Recycler", "214");
         recyclerView.setVisibility(View.VISIBLE);
-        recyclerViewAdapter = new RecyclerViewAdapter(this, getMyList());
-        recyclerView.setAdapter(recyclerViewAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(new outerAdapter(getApplicationContext(), getMyList()));
+        recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(20);
         recyclerView.setDrawingCacheEnabled(true);
         recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+    }
+
+    private void setData() {
+        VerticalModel verticalModel = new VerticalModel();
+        ArrayList<HorizontalModel> arrayListHorizontal = new ArrayList<>();
+//        verticalModel.setArrayList(getMyList());
+        arrayList.add(verticalModel);
+        adapter.notifyDataSetChanged();
     }
 
     //filling recyclerView through modelClass
@@ -344,8 +358,8 @@ public class MainActivity extends AppCompatActivity {
             super.onProgressUpdate(values);
             if (connection_time_end > 5000) {
                 Toast.makeText(getApplicationContext(), "This is taking longer than expected.\nThis usually happens due to network problems.\n If this continues try changing settings.", Toast.LENGTH_LONG).show();
+                initRecyclerView();
             }
-            initRecyclerView();
         }
 
         //This executes after background thread finishes its task
