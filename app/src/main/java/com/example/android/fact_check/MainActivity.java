@@ -30,7 +30,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.android.fact_check.adapter.models.VerticalModel;
 import com.example.android.fact_check.adapter.outerAdapter;
 import com.google.android.material.card.MaterialCardView;
 import com.google.gson.Gson;
@@ -76,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
     private OkHttpClient okHttpClient;
     private TextView long_time_text;
     private long connection_time_start, connection_time_end;
-    public ArrayList<VerticalModel> arrayList;
     RecyclerView verticalRecyclerView;
     outerAdapter adapter;
     public ArrayList<String> searchHistory;
@@ -88,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Fact Check Search");
         searchHistory = new ArrayList<>();
-        arrayList = new ArrayList<>();
         supermodel = new ArrayList<ArrayList<ModelClass>>();
         searchText = findViewById(R.id.search_text);
         error_text = findViewById(R.id.error_text);
@@ -355,8 +352,8 @@ public class MainActivity extends AppCompatActivity {
             super.onProgressUpdate(values);
             if (connection_time_end > 5000) {
                 Toast.makeText(getApplicationContext(), "This is taking longer than expected.\nThis usually happens due to network problems.\n If this continues try changing settings.", Toast.LENGTH_LONG).show();
-                initRecyclerView();
             }
+//            initRecyclerView();
         }
 
         //This executes after background thread finishes its task

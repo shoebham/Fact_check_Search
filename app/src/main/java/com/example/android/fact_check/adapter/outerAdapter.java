@@ -42,7 +42,7 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull outerAdapter.ViewHolder holder, int position) {
         Log.v("recycler", "size:" + searchHistory.size());
-        for (int i = 0; i <= searchHistory.size(); i++) {
+        for (int i = searchHistory.size() - 1; i >= 0; i--) {
             if (position == searchHistory.size() - 1 - i) {
                 final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
                 layoutManager.setMeasurementCacheEnabled(false);
