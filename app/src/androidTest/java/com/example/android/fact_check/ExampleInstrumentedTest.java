@@ -28,7 +28,8 @@ public class ExampleInstrumentedTest {
     /* TODO
      *   Tests for
      *   Nested RecyclerView
-     *
+     *   RecyclerView images
+     *   RecyclerView size
      *
      *
      * */

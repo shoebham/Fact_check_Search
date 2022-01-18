@@ -43,7 +43,6 @@ import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 
-
 public class MainActivity extends AppCompatActivity {
 
 
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public ImageView imageView;
     public MaterialCardView cardView;
     public ImageButton parameters;
-    private Search search;
+    public Search search;
     private TextView emptyText;
     private TextView invalid_search;
     private TextView error_text;
@@ -138,15 +137,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    //    hides and shows things like progress bar etc
     protected void showAndHideThingsOnSearch() {
         if (!searchText.getText().toString().equals("")) {
             sendData();
             start = System.currentTimeMillis();
-            recyclerView.setVisibility(View.GONE);
-            emptyText.setVisibility(View.GONE);
-            invalid_search.setVisibility(View.GONE);
-            error_text.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
+            toggleVisibility(recyclerView, 8);
+            toggleVisibility(emptyText, 8);
+            toggleVisibility(invalid_search, 8);
+            toggleVisibility(error_text, 8);
+            toggleVisibility(progressBar, 0);
+//            recyclerView.setVisibility(View.GONE);
+//            emptyText.setVisibility(View.GONE);
+//            invalid_search.setVisibility(View.GONE);
+//            error_text.setVisibility(View.GONE);
+//            progressBar.setVisibility(View.VISIBLE);
             Toast.makeText(getApplicationContext(), "Loading...\n Please wait...", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), "Enter Some Text", Toast.LENGTH_SHORT).show();
@@ -167,6 +173,13 @@ public class MainActivity extends AppCompatActivity {
     }
     //sending data to the API
 
+    public void toggleVisibility(View view, int visibility) {
+//        invisible-4
+//        visible-0
+//        gone-8
+        view.setVisibility(visibility);
+    }
+
     public void sendData() {
         try {
             Log.i("response", "intent get result " + language);
@@ -182,8 +195,10 @@ public class MainActivity extends AppCompatActivity {
                         public void onResponse(JSONObject response) {
                             Log.i("response", response.toString());
                             if (response.toString().equals("{}")) {
-                                invalid_search.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
+                                toggleVisibility(invalid_search, 0);
+                                toggleVisibility(progressBar, 8);
+//                                invalid_search.setVisibility(View.VISIBLE);
+//                                progressBar.setVisibility(View.GONE);
                                 Toast.makeText(getApplicationContext(), "your search did not match any claims", Toast.LENGTH_SHORT).show();
                             } else {
                                 search = gson.fromJson(response.toString(), Search.class);
@@ -196,8 +211,10 @@ public class MainActivity extends AppCompatActivity {
                         public void onErrorResponse(VolleyError error) {
                             Log.i("response", error.toString());// TODO: Handle error
                             error.printStackTrace();
-                            progressBar.setVisibility(View.GONE);
-                            error_text.setVisibility(View.VISIBLE);
+                            toggleVisibility(progressBar, 0);
+                            toggleVisibility(error_text, 8);
+//                            progressBar.setVisibility(View.GONE);
+//                            error_text.setVisibility(View.VISIBLE);
 
                             Toast.makeText(getApplicationContext(), "Some unexpected error occurred", Toast.LENGTH_SHORT).show();
                         }
@@ -214,7 +231,8 @@ public class MainActivity extends AppCompatActivity {
         Log.v("Recycler", "214");
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         supermodel.add(getMyList());
-        recyclerView.setVisibility(View.VISIBLE);
+        toggleVisibility(recyclerView, 0);
+//        recyclerView.setVisibility(View.VISIBLE);
         recyclerView.setAdapter(new outerAdapter(getApplicationContext(), supermodel, getMyList(), searchHistory));
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(20);
@@ -234,24 +252,9 @@ public class MainActivity extends AppCompatActivity {
             m.setWebsiteUrl(website_url.get(i));
             Log.i("response", "I am in getMyList() and website url is " + website_url);
             models.add(m);
-//            claim_text.setText("Claim:- " + search.claims.get(i).text);
-//            claimant_text.setText("Claimant:- " + search.claims.get(i).claimant);
-//            review_text.setText("Factual Rating:-" + search.claims.get(i).claimReview.get(0).textualRating);
+
         }
         return models;
-    }
-
-    //claims class
-    class claims {
-        private String text;
-        private String claimant;
-        private String claimDate;
-        private ArrayList<claimReview> claimReview;
-    }
-
-    class publisher {
-        private String name;
-        private String site;
     }
 
     @Override
@@ -259,25 +262,10 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    //Class for gson
-    class Search {
-        private ArrayList<claims> claims;
-        private String nextPageToken;
-
-    }
-
-    class claimReview {
-        private publisher publisher;
-        private String url;
-        private String title;
-        private String reviewDate;
-        private String textualRating;
-        private String languageCode;
-    }
 
     //This is where the most of the work of the App is done
     //getting Image by scraping image from the url
-    private class getImage extends AsyncTask<Void, Void, Void> {
+    class getImage extends AsyncTask<Void, Void, Void> {
 
         //Background Thread that connects to the website and searches for image url
         @SuppressLint("WrongThread")
@@ -288,21 +276,12 @@ public class MainActivity extends AppCompatActivity {
             try {
                 imageUrl = new ArrayList<>();
                 website_url = new ArrayList<>();
-//                OkHttpClient okHttpClient = new OkHttpClient.Builder()
-//                        .connectTimeout(30,TimeUnit.SECONDS)
-//                        .readTimeout(30, TimeUnit.SECONDS)
-//                        .writeTimeout(30, TimeUnit.SECONDS)
-//                        .retryOnConnectionFailure(true)
-//                        .protocols(Collections.singletonList(Protocol.HTTP_1_1))
-//                        .build();
+
                 for (int i = 0; i < search.claims.size(); i++) {
                     if (isCancelled()) {
                         break;
                     }
-//                        okhttp3.Request request = new okhttp3.Request.Builder()
-//                                .url(search.claims.get(i).claimReview.get(0).url)
-//                                .build();
-//                        document = Jsoup.parse(okHttpClient.newCall(request).execute().body().string());
+
 
                     connection_time_start = System.currentTimeMillis();
                     document = Jsoup.connect(search.claims.get(i).claimReview.get(0).url).ignoreHttpErrors(true)
