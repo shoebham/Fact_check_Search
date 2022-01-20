@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             sendData();
             start = System.currentTimeMillis();
 
-//            toggleVisibility(recyclerView, 8);
+            toggleVisibility(recyclerView, 8);
             toggleVisibility(emptyText, 8);
             toggleVisibility(invalid_search, 8);
             toggleVisibility(error_text, 8);

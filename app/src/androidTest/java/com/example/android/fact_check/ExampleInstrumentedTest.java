@@ -54,13 +54,13 @@ public class ExampleInstrumentedTest {
     public void testSearchBox() {
         onView(withId(R.id.search_text)).perform(typeText("Modi"), closeSoftKeyboard());
         onView(withId(R.id.search_button)).perform(click());
-        recyclerViewTest();
+//        recyclerViewTest();
     }
 
     @Test
     public void recyclerViewTest() {
-//        onView(withId(R.id.search_text)).perform(typeText("Modi"), closeSoftKeyboard());
-//        onView(withId(R.id.search_button)).perform(click());
+        onView(withId(R.id.search_text)).perform(typeText("Modi"), closeSoftKeyboard());
+        onView(withId(R.id.search_button)).perform(click());
         onView(withId(R.id.progressbar)).check
                 (matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
         onView(withId(R.id.searched_text)).check(matches(withText("Modi")));
@@ -77,7 +77,7 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void multipleSearch() {
-        onView(withId(R.id.search_text)).perform(typeText("Modi"), closeSoftKeyboard());
+        onView(withId(R.id.search_text)).perform(clearText(), typeText("Modi"), closeSoftKeyboard());
         onView(withId(R.id.search_button)).perform(click());
         onView(withId(R.id.search_text)).perform(clearText());
         onView(withId(R.id.search_text)).perform(typeText("Biden"), closeSoftKeyboard());
@@ -95,7 +95,7 @@ public class ExampleInstrumentedTest {
         onView(withText("Hindi")).perform(click());
         onView(withId(R.id.save)).perform(click());
 
-        scrollWorking();
+//        scrollWorking();
     }
 
 
