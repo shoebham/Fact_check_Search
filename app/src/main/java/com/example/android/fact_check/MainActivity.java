@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //    hides and shows things like progress bar etc
+//    hides and shows things like progress bar etc
     protected void showAndHideThingsOnSearch() {
         if (!searchText.getText().toString().equals("")) {
             sendData();
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             toggleVisibility(emptyText, 8);
             toggleVisibility(invalid_search, 8);
             toggleVisibility(error_text, 8);
-            toggleVisibility(progressBar, 0);
+//            toggleVisibility(progressBar,0);
 //            recyclerView.setVisibility(View.GONE);
 //            emptyText.setVisibility(View.GONE);
 //            invalid_search.setVisibility(View.GONE);
