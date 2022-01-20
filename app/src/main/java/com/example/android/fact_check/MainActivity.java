@@ -19,10 +19,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.IdlingResource;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -42,6 +45,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
     outerAdapter adapter;
     public ArrayList<String> searchHistory;
     public ArrayList<ArrayList<ModelClass>> supermodel;
+    @Nullable
+    public SimpleIdlingResource mIdlingResource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,11 +149,12 @@ public class MainActivity extends AppCompatActivity {
         if (!searchText.getText().toString().equals("")) {
             sendData();
             start = System.currentTimeMillis();
-            toggleVisibility(recyclerView, 8);
+
+//            toggleVisibility(recyclerView, 8);
             toggleVisibility(emptyText, 8);
             toggleVisibility(invalid_search, 8);
             toggleVisibility(error_text, 8);
-//            toggleVisibility(progressBar,0);
+            toggleVisibility(progressBar, 0);
 //            recyclerView.setVisibility(View.GONE);
 //            emptyText.setVisibility(View.GONE);
 //            invalid_search.setVisibility(View.GONE);
@@ -182,6 +189,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendData() {
         try {
+            if (mIdlingResource != null) {
+                mIdlingResource.setIdleState(false);
+                System.out.println("midlingresource" + mIdlingResource.isIdleNow());
+            }
             Log.i("response", "intent get result " + language);
             Log.i("response", "intent get result " + resultSize);
             RequestQueue queue = Volley.newRequestQueue(this);
@@ -262,18 +273,37 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        System.out.println("mIdlingResource" + mIdlingResource.isIdleNow());
+        return mIdlingResource;
+    }
 
     //This is where the most of the work of the App is done
     //getting Image by scraping image from the url
-    class getImage extends AsyncTask<Void, Void, Void> {
-
+    public class getImage extends AsyncTask<Void, Void, Void> {
         //Background Thread that connects to the website and searches for image url
+        private SimpleIdlingResource idlingResource;
+
+        //        getImage(){
+////            this.idlingResource=idlingResource;
+//            if(idlingResource!=null) {
+//                System.out.println("midlingresource" + idlingResource.isIdleNow());
+//            }
+//        }
         @SuppressLint("WrongThread")
         @Override
         protected Void doInBackground(Void... voids) {
+
+
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             Log.i("response", "operation started");
             try {
+
                 imageUrl = new ArrayList<>();
                 website_url = new ArrayList<>();
 
@@ -322,6 +352,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+
             return null;
         }
 
@@ -329,6 +360,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
+
             if (connection_time_end > 5000) {
                 Toast.makeText(getApplicationContext(), "This is taking longer than expected.\nThis usually happens due to network problems.\n If this continues try changing settings.", Toast.LENGTH_LONG).show();
             }
@@ -339,13 +371,21 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             try {
+
                 initRecyclerView();
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "Search Finished.", Toast.LENGTH_LONG).show();
+                if (mIdlingResource != null) {
+                    mIdlingResource.setIdleState(true);
+                }
                 super.onPostExecute(aVoid);
+
+
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Your search did not match any claims", Toast.LENGTH_SHORT).show();
             }
         }
+
     }
+
 }

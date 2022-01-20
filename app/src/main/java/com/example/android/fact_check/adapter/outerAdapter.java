@@ -70,8 +70,8 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
         TextView textView;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            recyclerView = itemView.findViewById(R.id.outer_recycler);
-            textView = itemView.findViewById(R.id.search_text);
+            recyclerView = itemView.findViewById(R.id.inner_recycler);
+            textView = itemView.findViewById(R.id.searched_text);
         }
     }
 
