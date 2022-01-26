@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class MainActivityViewModel extends AndroidViewModel {
 
     Application application;
-    private MutableLiveData<ArrayList<ModelClass>> currentSearch;
+    private MutableLiveData<ArrayList<ArrayList<ModelClass>>> currentSearch;
     private SearchRepository searchRepository;
 
     public MainActivityViewModel(@NonNull Application application) {
@@ -32,12 +32,12 @@ public class MainActivityViewModel extends AndroidViewModel {
         currentSearch = searchRepository.getCurrentSearch();
     }
 
-    public LiveData<ArrayList<ModelClass>> getCurrentSearch() {
+    public LiveData<ArrayList<ArrayList<ModelClass>>> getCurrentSearch() {
         return currentSearch;
     }
 
     public void search(String searchText, String language, String resultSize) {
-        searchRepository.search(searchText, language, resultSize);
+        searchRepository.search(searchText, language, resultSize, searchRepository);
     }
 //    public LiveData<ArrayList<ArrayList<ModelClass>>> getSearchHistory
 //            (String toString, String language, String resultSize) {

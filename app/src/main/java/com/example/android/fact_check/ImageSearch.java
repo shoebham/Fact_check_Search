@@ -7,6 +7,8 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.android.fact_check.repository.SearchRepository;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -15,9 +17,10 @@ import java.util.ArrayList;
 
 public class ImageSearch extends AsyncTask<Void, Void, Void> {
     Context context;
-    ArrayList<String> imgUrlList;
+    ArrayList<String> imgUrlList = new ArrayList<>();
     Search search;
     long start;
+    SearchRepository searchRepository = SearchRepository.getInstance(context);
     //Background Thread that connects to the website and searches for image url
     private SimpleIdlingResource idlingResource;
     MutableLiveData<ArrayList<ModelClass>> data;
@@ -29,14 +32,13 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
         this.imgUrlList = imgUrlList;
     }
 
-    public ImageSearch(Context context, Search search, ArrayList<String> imgUrlList, long start,
-                       MutableLiveData<ArrayList<ModelClass>> data) {
-        this.context = context;
-        this.search = search;
-        this.start = start;
-        this.imgUrlList = imgUrlList;
-        this.data = data;
-    }
+//    public ImageSearch(Context context, Search search, ArrayList<String> imgUrlList, long start) {
+//        this.context = context;
+//        this.search = search;
+//        this.start = start;
+//        this.imgUrlList = imgUrlList;
+//        this.data = data;
+//    }
 
     @SuppressLint("WrongThread")
     @Override
@@ -105,8 +107,25 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         try {
             super.onPostExecute(aVoid);
-            Log.v("response-image-search", "HERE");
-            data.postValue(new SearchResult().getModelClass(search, imgUrlList));
+            ArrayList<ArrayList<ModelClass>> searchHistory = searchRepository.getCurrentSearch().getValue();
+            if (searchHistory != null) {
+                Log.v("response-image-search", "HERE");
+                ArrayList<ModelClass> modelClasses = new SearchResult().getModelClass(search, imgUrlList);
+                Log.v("response-image-search", modelClasses.size() + "");
+
+                for (ModelClass m : modelClasses) {
+                    Log.v("response-image-search", m.getClaim());
+                }
+                searchHistory.add(modelClasses);
+            }
+//            for(ArrayList<ModelClass> mc:searchHistory)
+//            {
+//                for(ModelClass m:mc){
+//                    Log.v("response-image-search",m.getClaim());
+//                }
+//            }
+            searchRepository.getCurrentSearch().setValue(searchHistory);
+//            data.postValue(new SearchResult().getModelClass(search, imgUrlList));
         } catch (Exception e) {
         }
     }

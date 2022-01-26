@@ -100,6 +100,9 @@ public class SearchResult implements searchApi {
             Log.i("response", "I am in getMyList() and website url is " + search.claims.get(i).claimReview.get(0).url);
             models.add(m);
         }
+        for (ModelClass m : models) {
+            Log.v("response-search-result", m.getImageUrl());
+        }
         return models;
     }
 }

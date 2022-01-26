@@ -95,15 +95,20 @@ public class MainActivity extends AppCompatActivity {
         mMainActivityViewModel.init();
 
         mMainActivityViewModel.getCurrentSearch().observe(this,
-                new Observer<ArrayList<ModelClass>>() {
+                new Observer<ArrayList<ArrayList<ModelClass>>>() {
                     @Override
-                    public void onChanged(ArrayList<ModelClass> searches) {
+                    public void onChanged(ArrayList<ArrayList<ModelClass>> searches) {
                         if (!searches.isEmpty()) {
-                            supermodel.add(searches);
+                            supermodel = searches;
                             Log.i("response", supermodel.size() + "super");
-                            mAdapter.notifyDataSetChanged();
+                            for (ArrayList<ModelClass> mc : searches) {
+                                for (ModelClass m : mc) {
+                                    Log.v("response", m.getClaim());
+                                }
+                            }
                         }
                         recyclerView.setVisibility(View.VISIBLE);
+                        mAdapter.notifyDataSetChanged();
                     }
                 });
         initRecyclerView();
@@ -274,7 +279,6 @@ private ArrayList<ArrayList<ModelClass>> demoClass() {
 //        supermodel.add(getMyList());
         mAdapter = new outerAdapter(
                 getApplicationContext(),
-                supermodel,
                 mMainActivityViewModel.getCurrentSearch().getValue(), searchHistory);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         progressBar.setVisibility(View.GONE);

@@ -26,11 +26,10 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
     }
 
     public outerAdapter(Context context,
-                        ArrayList<ArrayList<ModelClass>> supermodel,
-                        ArrayList<ModelClass> models, ArrayList<String> searchHistory) {
-//        Log.v("Recycler", models.get(0).getClaim());
+                        ArrayList<ArrayList<ModelClass>> supermodel, ArrayList<String> searchHistory) {
+        Log.v("response-outer-adapter", "here");
         this.context = context;
-        this.models = models;
+//        this.models = models;
         this.searchHistory = searchHistory;
         this.supermodel = supermodel;
     }

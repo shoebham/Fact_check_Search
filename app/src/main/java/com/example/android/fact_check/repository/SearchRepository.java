@@ -27,9 +27,9 @@ public class SearchRepository {
     Search search;
     long start;
     private Context context;
-    private ArrayList<ModelClass> dataSet = new ArrayList<ModelClass>();
+    private ArrayList<ArrayList<ModelClass>> dataSet = new ArrayList<>();
     private Gson gson = new Gson();
-    private MutableLiveData<ArrayList<ModelClass>> data;
+    private MutableLiveData<ArrayList<ArrayList<ModelClass>>> data;
     private ArrayList<String> imgUrlList = new ArrayList<>();
 
 
@@ -46,18 +46,21 @@ public class SearchRepository {
         return instance;
     }
 
-    public MutableLiveData<ArrayList<ModelClass>> getCurrentSearch() {
+    public MutableLiveData<ArrayList<ArrayList<ModelClass>>> getCurrentSearch() {
 //        setSearchHistory();
         data.setValue(dataSet);
 //        Log.v("response-viewmodel-",data.getValue().size()+"");
         return data;
     }
 
-    public void search(String searchText, String language, String resultSize) {
-        search = getSearchResult(searchText, language, resultSize);
+    public void search(String searchText, String language, String resultSize, SearchRepository searchRepository) {
+        search = getSearchResult(searchText, language, resultSize, searchRepository);
     }
 
-    public Search getSearchResult(String searchText, String language, String resultSize) {
+    public Search getSearchResult(String searchText,
+                                  String language,
+                                  String resultSize,
+                                  final SearchRepository searchRepository) {
         start = System.currentTimeMillis();
         RequestQueue queue = Volley.newRequestQueue(context);
         String API_KEY = context.getString(R.string.api_key);
@@ -72,7 +75,7 @@ public class SearchRepository {
 
                         } else {
                             search = gson.fromJson(response.toString(), Search.class);
-                            getImageResult(imgUrlList);
+                            getImageResult(searchRepository);
 //                            setSearchHistory(imgUrlList);
 //                            data.postValue(setSearchHistory(imgUrlList));
                         }
@@ -90,8 +93,9 @@ public class SearchRepository {
     }
 
 
-    public void getImageResult(ArrayList<String> imgUrlList) {
-        ImageSearch imageSearch = new ImageSearch(context, search, imgUrlList, start, data);
+    public void getImageResult(SearchRepository searchRepository) {
+        imgUrlList = new ArrayList<>();
+        ImageSearch imageSearch = new ImageSearch(context, search, imgUrlList, start);
         imageSearch.execute();
     }
 
