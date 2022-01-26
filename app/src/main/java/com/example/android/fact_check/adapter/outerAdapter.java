@@ -22,8 +22,13 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
     ArrayList<String> searchHistory;
     ArrayList<ArrayList<ModelClass>> supermodel;
 
-    public outerAdapter(Context context, ArrayList<ArrayList<ModelClass>> supermodel, ArrayList<ModelClass> models, ArrayList<String> searchHistory) {
-        Log.v("Recycler", models.get(0).getClaim());
+    public outerAdapter() {
+    }
+
+    public outerAdapter(Context context,
+                        ArrayList<ArrayList<ModelClass>> supermodel,
+                        ArrayList<ModelClass> models, ArrayList<String> searchHistory) {
+//        Log.v("Recycler", models.get(0).getClaim());
         this.context = context;
         this.models = models;
         this.searchHistory = searchHistory;
@@ -41,9 +46,9 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull outerAdapter.ViewHolder holder, int position) {
-        Log.v("recycler", "size:" + searchHistory.size());
-        for (int i = searchHistory.size() - 1; i >= 0; i--) {
-            if (position == searchHistory.size() - 1 - i) {
+        Log.v("response-outer-adapter", "size:" + supermodel.size());
+        for (int i = supermodel.size() - 1; i >= 0; i--) {
+            if (position == supermodel.size() - 1 - i) {
                 final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
                 layoutManager.setMeasurementCacheEnabled(false);
                 holder.recyclerView.setLayoutManager(layoutManager);
@@ -55,14 +60,14 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
                     }
                 });
                 holder.recyclerView.setAdapter(new innerAdapter(context, supermodel.get(i)));
-                holder.textView.setText(searchHistory.get(i));
+//                holder.textView.setText(searchHistory.get(i));
             }
         }
     }
 
     @Override
     public int getItemCount() {
-        return searchHistory.size();
+        return supermodel.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

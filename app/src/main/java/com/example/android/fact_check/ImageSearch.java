@@ -4,7 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
+
+import androidx.lifecycle.MutableLiveData;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,12 +20,22 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
     long start;
     //Background Thread that connects to the website and searches for image url
     private SimpleIdlingResource idlingResource;
+    MutableLiveData<ArrayList<ModelClass>> data;
 
-    ImageSearch(Context context, Search search, ArrayList<String> imgUrlList, long start) {
+    public ImageSearch(Context context, Search search, ArrayList<String> imgUrlList, long start) {
         this.context = context;
         this.search = search;
         this.start = start;
         this.imgUrlList = imgUrlList;
+    }
+
+    public ImageSearch(Context context, Search search, ArrayList<String> imgUrlList, long start,
+                       MutableLiveData<ArrayList<ModelClass>> data) {
+        this.context = context;
+        this.search = search;
+        this.start = start;
+        this.imgUrlList = imgUrlList;
+        this.data = data;
     }
 
     @SuppressLint("WrongThread")
@@ -45,6 +56,7 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
                         .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36")
                         .cookie("auth", "token").timeout(30_000)
                         .get();
+
                 long connection_time_end = System.currentTimeMillis() - connection_time_start;
 
                 Log.i("response", "-------------------------------");
@@ -64,7 +76,6 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
                     Log.i("response", "url of website :- " + search.claims.get(i).claimReview.get(0).url);
                     Log.i("response", "url of image :- " + imgUrl);
                     imgUrlList.add(imgUrl);
-//                    website_url.add(search.claims.get(i).claimReview.get(0).url);
                 }
                 publishProgress();
             }
@@ -72,11 +83,11 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
 
         } catch (Exception e) {
             e.printStackTrace();
-            ((MainActivity) context).runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(context, "Some Strange Error Occurred", Toast.LENGTH_SHORT).show();
-                }
-            });
+//            ((MainActivity) context).runOnUiThread(new Runnable() {
+//                public void run() {
+//                    Toast.makeText(context, "Some Strange Error Occurred", Toast.LENGTH_SHORT).show();
+//                }
+//            });
         }
 
         return null;
@@ -87,28 +98,21 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
     protected void onProgressUpdate(Void... values) {
         super.onProgressUpdate(values);
 
-//        if (connection_time_end > 5000) {
-//            Toast.makeText(getApplicationContext(), "This is taking longer than expected.\nThis usually happens due to network problems.\n If this continues try changing settings.", Toast.LENGTH_LONG).show();
-//        }
     }
 
     //This executes after background thread finishes its task
     @Override
     protected void onPostExecute(Void aVoid) {
         try {
-
-//            initRecyclerView();
-//            progressBar.setVisibility(View.GONE);
-//            Toast.makeText(getApplicationContext(), "Search Finished.", Toast.LENGTH_LONG).show();
-//            if (mIdlingResource != null) {
-//                mIdlingResource.setIdleState(true);
-//            }
             super.onPostExecute(aVoid);
-
-
+            Log.v("response-image-search", "HERE");
+            data.postValue(new SearchResult().getModelClass(search, imgUrlList));
         } catch (Exception e) {
-//            Toast.makeText(getApplicationContext(), "Your search did not match any claims", Toast.LENGTH_SHORT).show();
         }
     }
+
+//    protected MutableLiveData<ArrayList<ModelClass>> getMutableData(){
+//        return data;
+//    }
 
 }

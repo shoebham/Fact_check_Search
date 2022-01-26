@@ -1,6 +1,7 @@
 package com.example.android.fact_check;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -14,10 +15,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+
 interface searchApi {
     Search getSearchResult(String searchText, String language, String resultSize);
 
     void getImageResult(ArrayList<String> imgUrlList);
+
+    ArrayList<ModelClass> getModelClass(Search search, ArrayList<String> imgUrlList);
 }
 
 public class SearchResult implements searchApi {
@@ -29,7 +33,11 @@ public class SearchResult implements searchApi {
     Search search;
     ArrayList<String> imgUrlList = new ArrayList<>();
 
-    SearchResult(Context context) {
+    public SearchResult() {
+
+    }
+
+    public SearchResult(Context context) {
         this.context = context;
         searchState.isSearching = true;
     }
@@ -77,5 +85,21 @@ public class SearchResult implements searchApi {
 
     public void setSearch(Search search) {
         this.search = search;
+    }
+
+    @Override
+    public ArrayList<ModelClass> getModelClass(Search search, ArrayList<String> imgUrlList) {
+        ArrayList<ModelClass> models = new ArrayList<>();
+        for (int i = 0; i < imgUrlList.size(); i++) {
+            ModelClass m = new ModelClass();
+            m.setClaim("Claim:- " + search.claims.get(i).text);
+            m.setClaimant("Claimant:- " + search.claims.get(i).claimant);
+            m.setReview("Factual Rating:- " + search.claims.get(i).claimReview.get(0).textualRating);
+            m.setImageUrl(imgUrlList.get(i));
+            m.setWebsiteUrl(search.claims.get(i).claimReview.get(0).url);
+            Log.i("response", "I am in getMyList() and website url is " + search.claims.get(i).claimReview.get(0).url);
+            models.add(m);
+        }
+        return models;
     }
 }

@@ -21,11 +21,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.IdlingResource;
 
 import com.example.android.fact_check.adapter.outerAdapter;
+import com.example.android.fact_check.viewmodels.MainActivityViewModel;
 import com.google.android.material.card.MaterialCardView;
 import com.google.gson.Gson;
 
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView invalid_search;
     private TextView error_text;
     private RecyclerView recyclerView;
-    private ArrayList<String> imageUrl;
+    private ArrayList<String> imageUrl = new ArrayList<>();
     private ProgressBar progressBar;
     private Gson gson = new Gson();
     private ArrayList<String> website_url;
@@ -74,12 +77,40 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<ArrayList<ModelClass>> supermodel;
     @Nullable
     public SimpleIdlingResource mIdlingResource;
+    private MainActivityViewModel mMainActivityViewModel;
+    private outerAdapter mAdapter;
+    private ArrayList<ModelClass> modelClasses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Fact Check Search");
+        initViews();
+        setClickListeners();
+//        mAdapter = new outerAdapter();
+        supermodel = new ArrayList<ArrayList<ModelClass>>();
+
+        mMainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        mMainActivityViewModel.init();
+
+        mMainActivityViewModel.getCurrentSearch().observe(this,
+                new Observer<ArrayList<ModelClass>>() {
+                    @Override
+                    public void onChanged(ArrayList<ModelClass> searches) {
+                        if (!searches.isEmpty()) {
+                            supermodel.add(searches);
+                            Log.i("response", supermodel.size() + "super");
+                            mAdapter.notifyDataSetChanged();
+                        }
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                });
+        initRecyclerView();
+
+    }
+
+    public void initViews() {
         searchHistory = new ArrayList<>();
         supermodel = new ArrayList<ArrayList<ModelClass>>();
         searchText = findViewById(R.id.search_text);
@@ -96,12 +127,18 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         parameters = findViewById(R.id.parameters);
         long_time_text = findViewById(R.id.long_time_text);
+    }
+
+    public void setClickListeners() {
         //Search Button onClickListener
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SearchResult searchResult = new SearchResult(getApplicationContext());
-                search = searchResult.getSearchResult(searchText.getText().toString(), language, resultSize);
+                mMainActivityViewModel.search(searchText.getText().toString(), language, resultSize);
+//                SearchResult searchResult = new SearchResult(getApplicationContext());
+//                search = searchResult.getSearchResult(searchText.getText().toString(), language, resultSize);
+//                modelClasses = searchResult.getModelClass(search,imageUrl);
+//                supermodel.add(modelClasses);
                 showAndHideThingsOnSearch();
             }
         });
@@ -118,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         });
         Log.i("response", "intent get result " + resultSize);
 
+
         //Search Bar OnClickListener which shows keyboard
         searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -132,20 +170,19 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
     }
-
 
 //    hides and shows things like progress bar etc
     protected void showAndHideThingsOnSearch() {
         if (!searchText.getText().toString().equals("")) {
 //            sendData();
+//            initRecyclerView();
             start = System.currentTimeMillis();
-            recyclerView.setVisibility(View.GONE);
+//            recyclerView.setVisibility(View.GONE);
             emptyText.setVisibility(View.GONE);
             invalid_search.setVisibility(View.GONE);
             error_text.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
+//            progressBar.setVisibility(View.VISIBLE);
             Toast.makeText(getApplicationContext(), "Loading...\n Please wait...", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), "Enter Some Text", Toast.LENGTH_SHORT).show();
@@ -214,14 +251,35 @@ public class MainActivity extends AppCompatActivity {
 //            Toast.makeText(getApplicationContext(), "Your search did not match any claims", Toast.LENGTH_SHORT).show();
 //        }
 //    }
-    //initialise recyclerView
+//initialise recyclerView
+private ArrayList<ArrayList<ModelClass>> demoClass() {
+    ArrayList<ArrayList<ModelClass>> demo = new ArrayList<>();
+    demo.add(demoModel());
+    return demo;
+}
+
+    private ArrayList<ModelClass> demoModel() {
+        ArrayList<ModelClass> mlist = new ArrayList<>();
+        ModelClass m = new ModelClass();
+        m.setClaim("a");
+        m.setClaimant("B");
+        m.setReview("f");
+        m.setWebsiteUrl("abcdefg");
+        m.setImageUrl("https://i.imgur.com/ZcLLrkY.jpg");
+        mlist.add(m);
+        return mlist;
+    }
 
     private void initRecyclerView() {
-        Log.v("Recycler", "214");
+//        supermodel.add(getMyList());
+        mAdapter = new outerAdapter(
+                getApplicationContext(),
+                supermodel,
+                mMainActivityViewModel.getCurrentSearch().getValue(), searchHistory);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-        supermodel.add(getMyList());
+        progressBar.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
-        recyclerView.setAdapter(new outerAdapter(getApplicationContext(), supermodel, getMyList(), searchHistory));
+        recyclerView.setAdapter(mAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(20);
         recyclerView.setDrawingCacheEnabled(true);
@@ -229,21 +287,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //filling recyclerView through modelClass
-    private ArrayList<ModelClass> getMyList() {
-        ArrayList<ModelClass> models = new ArrayList<>();
-        for (int i = 0; i < imageUrl.size(); i++) {
-            ModelClass m = new ModelClass();
-            m.setClaim("Claim:- " + search.claims.get(i).text);
-            m.setClaimant("Claimant:- " + search.claims.get(i).claimant);
-            m.setReview("Factual Rating:- " + search.claims.get(i).claimReview.get(0).textualRating);
-            m.setImageUrl(imageUrl.get(i));
-            m.setWebsiteUrl(website_url.get(i));
-            Log.i("response", "I am in getMyList() and website url is " + website_url);
-            models.add(m);
-
-        }
-        return models;
-    }
+//    private ArrayList<ModelClass> getMyList() {
+//        ArrayList<ModelClass> models = new ArrayList<>();
+//        for (int i = 0; i < imageUrl.size(); i++) {
+//            ModelClass m = new ModelClass();
+//            m.setClaim("Claim:- " + search.claims.get(i).text);
+//            m.setClaimant("Claimant:- " + search.claims.get(i).claimant);
+//            m.setReview("Factual Rating:- " + search.claims.get(i).claimReview.get(0).textualRating);
+//            m.setImageUrl(imageUrl.get(i));
+//            m.setWebsiteUrl(website_url.get(i));
+//            Log.i("response", "I am in getMyList() and website url is " + website_url);
+//            models.add(m);
+//        }
+//        return models;
+//    }
 
     @Override
     public void onBackPressed() {
