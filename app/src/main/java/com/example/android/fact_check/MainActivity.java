@@ -88,9 +88,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Fact Check Search");
         initViews();
         setClickListeners();
-//        mAdapter = new outerAdapter();
-        supermodel = new ArrayList<ArrayList<ModelClass>>();
-
         mMainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         mMainActivityViewModel.init();
 
@@ -111,9 +108,27 @@ public class MainActivity extends AppCompatActivity {
                         mAdapter.notifyDataSetChanged();
                     }
                 });
+
+        mMainActivityViewModel.getIsUpdating().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean) {
+                    progressBar.setVisibility(View.VISIBLE);
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+        });
+        mMainActivityViewModel.getErrorMessage().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+            }
+        });
         initRecyclerView();
 
     }
+
 
     public void initViews() {
         searchHistory = new ArrayList<>();
@@ -140,10 +155,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mMainActivityViewModel.search(searchText.getText().toString(), language, resultSize);
-//                SearchResult searchResult = new SearchResult(getApplicationContext());
-//                search = searchResult.getSearchResult(searchText.getText().toString(), language, resultSize);
-//                modelClasses = searchResult.getModelClass(search,imageUrl);
-//                supermodel.add(modelClasses);
                 showAndHideThingsOnSearch();
             }
         });
@@ -209,72 +220,7 @@ public class MainActivity extends AppCompatActivity {
     //sending data to the API
 
 
-//    public void sendData() {
-//        try {
-//            if (mIdlingResource != null) {
-//                mIdlingResource.setIdleState(false);
-//                System.out.println("midlingresource" + mIdlingResource.isIdleNow());
-//            }
-//            Log.i("response", "intent get result " + language);
-//            Log.i("response", "intent get result " + resultSize);
-//            RequestQueue queue = Volley.newRequestQueue(this);
-//            String search_text = searchText.getText().toString();
-//            searchHistory.add(search_text);
-//            String API_KEY = getString(R.string.api_key);
-//            String url = "https://factchecktools.googleapis.com/v1alpha1/claims:search?languageCode=" + language + "&pageSize=" + resultSize + "&query=" + search_text + "&key=" + API_KEY;
-//            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-//                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-//                        @Override
-//                        public void onResponse(JSONObject response) {
-//                            Log.i("response", response.toString());
-//                            if (response.toString().equals("{}")) {
-////                                toggleVisibility(invalid_search, 0);
-////                                toggleVisibility(progressBar, 8);
-//                                invalid_search.setVisibility(View.VISIBLE);
-//                                progressBar.setVisibility(View.GONE);
-//                                Toast.makeText(getApplicationContext(), "your search did not match any claims", Toast.LENGTH_SHORT).show();
-//                            } else {
-//                                search = gson.fromJson(response.toString(), Search.class);
-//                                Log.i("response", search.toString());
-//                                new getImage().execute();
-//                            }
-//                        }
-//                    }, new Response.ErrorListener() {
-//                        @Override
-//                        public void onErrorResponse(VolleyError error) {
-//                            Log.i("response", error.toString());// TODO: Handle error
-//                            error.printStackTrace();
-//                            progressBar.setVisibility(View.GONE);
-//                            error_text.setVisibility(View.VISIBLE);
-//
-//                            Toast.makeText(getApplicationContext(), "Some unexpected error occurred", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//            // Access the RequestQueue through your singleton class.
-//            queue.add(jsonObjectRequest);
-//        } catch (Exception e) {
-//            Toast.makeText(getApplicationContext(), "Your search did not match any claims", Toast.LENGTH_SHORT).show();
-//        }
-//    }
 //initialise recyclerView
-private ArrayList<ArrayList<ModelClass>> demoClass() {
-    ArrayList<ArrayList<ModelClass>> demo = new ArrayList<>();
-    demo.add(demoModel());
-    return demo;
-}
-
-    private ArrayList<ModelClass> demoModel() {
-        ArrayList<ModelClass> mlist = new ArrayList<>();
-        ModelClass m = new ModelClass();
-        m.setClaim("a");
-        m.setClaimant("B");
-        m.setReview("f");
-        m.setWebsiteUrl("abcdefg");
-        m.setImageUrl("https://i.imgur.com/ZcLLrkY.jpg");
-        mlist.add(m);
-        return mlist;
-    }
-
     private void initRecyclerView() {
 //        supermodel.add(getMyList());
         mAdapter = new outerAdapter(
@@ -290,21 +236,6 @@ private ArrayList<ArrayList<ModelClass>> demoClass() {
         recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     }
 
-    //filling recyclerView through modelClass
-//    private ArrayList<ModelClass> getMyList() {
-//        ArrayList<ModelClass> models = new ArrayList<>();
-//        for (int i = 0; i < imageUrl.size(); i++) {
-//            ModelClass m = new ModelClass();
-//            m.setClaim("Claim:- " + search.claims.get(i).text);
-//            m.setClaimant("Claimant:- " + search.claims.get(i).claimant);
-//            m.setReview("Factual Rating:- " + search.claims.get(i).claimReview.get(0).textualRating);
-//            m.setImageUrl(imageUrl.get(i));
-//            m.setWebsiteUrl(website_url.get(i));
-//            Log.i("response", "I am in getMyList() and website url is " + website_url);
-//            models.add(m);
-//        }
-//        return models;
-//    }
 
     @Override
     public void onBackPressed() {
@@ -321,99 +252,4 @@ private ArrayList<ArrayList<ModelClass>> demoClass() {
         return mIdlingResource;
     }
 
-    //This is where the most of the work of the App is done
-    //getting Image by scraping image from the url
-//    public class getImage extends AsyncTask<Void, Void, Void> {
-//        //Background Thread that connects to the website and searches for image url
-//        private SimpleIdlingResource idlingResource;
-//
-//        @SuppressLint("WrongThread")
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//
-//
-//            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-//            Log.i("response", "operation started");
-//            try {
-//                imageUrl = new ArrayList<>();
-//                website_url = new ArrayList<>();
-//
-//                for (int i = 0; i < search.claims.size(); i++) {
-//                    if (isCancelled()) {
-//                        break;
-//                    }
-//
-//
-//                    connection_time_start = System.currentTimeMillis();
-//                    document = Jsoup.connect(search.claims.get(i).claimReview.get(0).url).ignoreHttpErrors(true)
-//                            .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36")
-//                            .cookie("auth", "token").timeout(30_000)
-//                            .get();
-//                    connection_time_end = System.currentTimeMillis() - connection_time_start;
-//
-//                    Log.i("response", "-------------------------------");
-//                    Log.i("response", "time taken to make connection and parse " + connection_time_end + " ms");
-//                    //   Log.i("response", "document = "+document.toString());
-//                    img = document.select("meta[property=og:image]");
-//                    if (img == null) {
-//                        if ((img = document.select("meta[property=og:image:secure_url")) == null) {
-//                            img = document.select("meta[property=twitter:image]");
-//                        }
-//                    }
-//                    imgUrl = null;
-//
-//                    if (img != null) {
-//                        Log.i("response", i + "");
-//                        imgUrl = img.attr("content");
-//                        Log.i("response", "url of website :- " + search.claims.get(i).claimReview.get(0).url);
-//                        Log.i("response", "url of image :- " + imgUrl);
-//                        imageUrl.add(imgUrl);
-//                        website_url.add(search.claims.get(i).claimReview.get(0).url);
-//                    }
-//                    publishProgress();
-//                }
-//                Log.i("response", "Operation took " + (System.currentTimeMillis() - start) / 1000 + " seconds");
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                runOnUiThread(new Runnable() {
-//                    public void run() {
-//                        Toast.makeText(getApplicationContext(), "Some Strange Error Occurred", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//            }
-//
-//            return null;
-//        }
-//
-//        //If connection takes too long displays a toast
-//        @Override
-//        protected void onProgressUpdate(Void... values) {
-//            super.onProgressUpdate(values);
-//
-//            if (connection_time_end > 5000) {
-//                Toast.makeText(getApplicationContext(), "This is taking longer than expected.\nThis usually happens due to network problems.\n If this continues try changing settings.", Toast.LENGTH_LONG).show();
-//            }
-//        }
-//
-//        //This executes after background thread finishes its task
-//        @Override
-//        protected void onPostExecute(Void aVoid) {
-//            try {
-//
-//                initRecyclerView();
-//                progressBar.setVisibility(View.GONE);
-//                Toast.makeText(getApplicationContext(), "Search Finished.", Toast.LENGTH_LONG).show();
-//                if (mIdlingResource != null) {
-//                    mIdlingResource.setIdleState(true);
-//                }
-//                super.onPostExecute(aVoid);
-//
-//
-//            } catch (Exception e) {
-//                Toast.makeText(getApplicationContext(), "Your search did not match any claims", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//
-//    }
 }

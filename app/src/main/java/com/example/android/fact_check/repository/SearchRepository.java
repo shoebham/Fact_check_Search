@@ -3,6 +3,7 @@ package com.example.android.fact_check.repository;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.Request;
@@ -31,7 +32,8 @@ public class SearchRepository {
     private Gson gson = new Gson();
     private MutableLiveData<ArrayList<ArrayList<ModelClass>>> data;
     private ArrayList<String> imgUrlList = new ArrayList<>();
-
+    private MutableLiveData<Boolean> isUpdating = new MutableLiveData<>();
+    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     public SearchRepository(Context context) {
         this.context = context;
@@ -47,20 +49,33 @@ public class SearchRepository {
     }
 
     public MutableLiveData<ArrayList<ArrayList<ModelClass>>> getCurrentSearch() {
-//        setSearchHistory();
         data.setValue(dataSet);
-//        Log.v("response-viewmodel-",data.getValue().size()+"");
         return data;
     }
 
-    public void search(String searchText, String language, String resultSize, SearchRepository searchRepository) {
-        search = getSearchResult(searchText, language, resultSize, searchRepository);
+    public LiveData<Boolean> getIsUpdating() {
+        return isUpdating;
+    }
+
+    public void setIsUpdating(boolean aBoolean) {
+        isUpdating.postValue(aBoolean);
+    }
+
+    public LiveData<String> getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String message) {
+        errorMessage.postValue(message);
+    }
+
+    public void search(String searchText, String language, String resultSize) {
+        search = getSearchResult(searchText, language, resultSize);
     }
 
     public Search getSearchResult(String searchText,
                                   String language,
-                                  String resultSize,
-                                  final SearchRepository searchRepository) {
+                                  String resultSize) {
         start = System.currentTimeMillis();
         RequestQueue queue = Volley.newRequestQueue(context);
         String API_KEY = context.getString(R.string.api_key);
@@ -72,10 +87,11 @@ public class SearchRepository {
                     @Override
                     public void onResponse(JSONObject response) {
                         if (response.toString().equals("{}")) {
-
+                            setErrorMessage("Your search did not match any claims");
+                            setIsUpdating(false);
                         } else {
                             search = gson.fromJson(response.toString(), Search.class);
-                            getImageResult(searchRepository);
+                            getImageResult();
 //                            setSearchHistory(imgUrlList);
 //                            data.postValue(setSearchHistory(imgUrlList));
                         }
@@ -93,7 +109,7 @@ public class SearchRepository {
     }
 
 
-    public void getImageResult(SearchRepository searchRepository) {
+    public void getImageResult() {
         imgUrlList = new ArrayList<>();
         ImageSearch imageSearch = new ImageSearch(context, search, imgUrlList, start);
         imageSearch.execute();

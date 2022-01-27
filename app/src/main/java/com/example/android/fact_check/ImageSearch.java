@@ -32,14 +32,6 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
         this.imgUrlList = imgUrlList;
     }
 
-//    public ImageSearch(Context context, Search search, ArrayList<String> imgUrlList, long start) {
-//        this.context = context;
-//        this.search = search;
-//        this.start = start;
-//        this.imgUrlList = imgUrlList;
-//        this.data = data;
-//    }
-
     @SuppressLint("WrongThread")
     @Override
     protected Void doInBackground(Void... voids) {
@@ -85,11 +77,8 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
 
         } catch (Exception e) {
             e.printStackTrace();
-//            ((MainActivity) context).runOnUiThread(new Runnable() {
-//                public void run() {
-//                    Toast.makeText(context, "Some Strange Error Occurred", Toast.LENGTH_SHORT).show();
-//                }
-//            });
+            searchRepository.setErrorMessage("Some error occurred while getting images");
+            Log.v("response-image", "error");
         }
 
         return null;
@@ -105,6 +94,7 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
     //This executes after background thread finishes its task
     @Override
     protected void onPostExecute(Void aVoid) {
+        searchRepository.setIsUpdating(false);
         try {
             super.onPostExecute(aVoid);
             ArrayList<ArrayList<ModelClass>> searchHistory = searchRepository.getCurrentSearch().getValue();
@@ -118,15 +108,13 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
                 }
                 searchHistory.add(modelClasses);
             }
-//            for(ArrayList<ModelClass> mc:searchHistory)
-//            {
-//                for(ModelClass m:mc){
-//                    Log.v("response-image-search",m.getClaim());
-//                }
-//            }
+
             searchRepository.getCurrentSearch().setValue(searchHistory);
-//            data.postValue(new SearchResult().getModelClass(search, imgUrlList));
         } catch (Exception e) {
+            e.printStackTrace();
+            searchRepository.setErrorMessage("Your search did not match any claims");
+
+            Log.v("response-image", "error");
         }
     }
 

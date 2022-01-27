@@ -18,6 +18,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     Application application;
     private MutableLiveData<ArrayList<ArrayList<ModelClass>>> currentSearch;
     private SearchRepository searchRepository;
+    private MutableLiveData<Boolean> isUpdating = new MutableLiveData<>();
+    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -37,11 +39,15 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public void search(String searchText, String language, String resultSize) {
-        searchRepository.search(searchText, language, resultSize, searchRepository);
+        searchRepository.setIsUpdating(true);
+        searchRepository.search(searchText, language, resultSize);
     }
-//    public LiveData<ArrayList<ArrayList<ModelClass>>> getSearchHistory
-//            (String toString, String language, String resultSize) {
-//
-//        return mSearchHistory;
-//    }
+
+    public LiveData<Boolean> getIsUpdating() {
+        return searchRepository.getIsUpdating();
+    }
+
+    public LiveData<String> getErrorMessage() {
+        return searchRepository.getErrorMessage();
+    }
 }
