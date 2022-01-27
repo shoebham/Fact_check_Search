@@ -21,7 +21,7 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
     ArrayList<ModelClass> models;
     ArrayList<String> searchHistory;
     ArrayList<ArrayList<ModelClass>> supermodel;
-
+    RecyclerView.RecycledViewPool viewPool;
     public outerAdapter() {
     }
 
@@ -32,6 +32,7 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
 //        this.models = models;
         this.searchHistory = searchHistory;
         this.supermodel = supermodel;
+        viewPool = new RecyclerView.RecycledViewPool();
     }
 
     @NonNull
@@ -46,6 +47,7 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull outerAdapter.ViewHolder holder, int position) {
         Log.v("response-outer-adapter", "size:" + supermodel.size());
+//        holder.recyclerView.setRecycledViewPool(viewPool);
         for (int i = supermodel.size() - 1; i >= 0; i--) {
             if (position == supermodel.size() - 1 - i) {
                 final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);

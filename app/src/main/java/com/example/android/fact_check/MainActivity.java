@@ -97,18 +97,13 @@ public class MainActivity extends AppCompatActivity {
                     public void onChanged(ArrayList<ArrayList<ModelClass>> searches) {
                         if (!searches.isEmpty()) {
                             supermodel = searches;
-                            Log.i("response", supermodel.size() + "super");
-                            for (ArrayList<ModelClass> mc : searches) {
-                                for (ModelClass m : mc) {
-                                    Log.v("response", m.getClaim());
-                                }
-                            }
+                            Log.i("response", supermodel.size() + " super");
+                            hideThingsAfterSearch();
+                            recyclerView.setVisibility(View.VISIBLE);
+                            mAdapter.notifyDataSetChanged();
                         }
-                        recyclerView.setVisibility(View.VISIBLE);
-                        mAdapter.notifyDataSetChanged();
                     }
                 });
-
         mMainActivityViewModel.getIsUpdating().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
@@ -122,13 +117,26 @@ public class MainActivity extends AppCompatActivity {
         mMainActivityViewModel.getErrorMessage().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
-                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+                hideThingsAfterSearch();
+                if (recyclerView.getVisibility() != View.VISIBLE) {
+                    if (s.equals("Your search did not match any claims")) {
+                        invalid_search.setVisibility(View.VISIBLE);
+                    } else if (s.equals("Some error occurred while getting images")) {
+                        error_text.setVisibility(View.VISIBLE);
+                    }
+                }
+                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
             }
         });
         initRecyclerView();
 
     }
 
+    protected void hideThingsAfterSearch() {
+        invalid_search.setVisibility(View.GONE);
+        error_text.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+    }
 
     public void initViews() {
         searchHistory = new ArrayList<>();
@@ -177,7 +185,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_SEARCH) {
-                    showAndHideThingsOnSearch();
+//                    showAndHideThingsOnSearch();
+                    button.callOnClick();
                     searchText.clearFocus();
                     InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     in.hideSoftInputFromWindow(searchText.getWindowToken(), 0);
@@ -191,14 +200,10 @@ public class MainActivity extends AppCompatActivity {
 //    hides and shows things like progress bar etc
     protected void showAndHideThingsOnSearch() {
         if (!searchText.getText().toString().equals("")) {
-//            sendData();
-//            initRecyclerView();
             start = System.currentTimeMillis();
-//            recyclerView.setVisibility(View.GONE);
             emptyText.setVisibility(View.GONE);
             invalid_search.setVisibility(View.GONE);
             error_text.setVisibility(View.GONE);
-//            progressBar.setVisibility(View.VISIBLE);
             Toast.makeText(getApplicationContext(), "Loading...\n Please wait...", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), "Enter Some Text", Toast.LENGTH_SHORT).show();

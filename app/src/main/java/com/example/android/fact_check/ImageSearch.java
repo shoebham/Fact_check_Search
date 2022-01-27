@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -14,6 +15,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class ImageSearch extends AsyncTask<Void, Void, Void> {
     Context context;
@@ -32,12 +38,31 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
         this.imgUrlList = imgUrlList;
     }
 
+    long connection_time_end;
+
+
     @SuppressLint("WrongThread")
     @Override
     protected Void doInBackground(Void... voids) {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         Log.i("response", "operation started");
+
+
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            }
+        }};
         try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 //            imgUrlList = new ArrayList<>();
 //            website_url = new ArrayList<>();
 
@@ -46,12 +71,13 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
                     break;
                 }
                 long connection_time_start = System.currentTimeMillis();
-                Document document = Jsoup.connect(search.claims.get(i).claimReview.get(0).url).ignoreHttpErrors(true)
+                Document document = Jsoup.connect(search.claims.get(i).claimReview.get(0).url)
+                        .ignoreHttpErrors(true)
                         .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36")
                         .cookie("auth", "token").timeout(30_000)
                         .get();
 
-                long connection_time_end = System.currentTimeMillis() - connection_time_start;
+                connection_time_end = System.currentTimeMillis() - connection_time_start;
 
                 Log.i("response", "-------------------------------");
                 Log.i("response", "time taken to make connection and parse " + connection_time_end + " ms");
@@ -87,6 +113,9 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
     //If connection takes too long displays a toast
     @Override
     protected void onProgressUpdate(Void... values) {
+        if (connection_time_end > 4000) {
+            Toast.makeText(context, "Search is taking longer than expected", Toast.LENGTH_SHORT).show();
+        }
         super.onProgressUpdate(values);
 
     }
@@ -102,24 +131,15 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
                 Log.v("response-image-search", "HERE");
                 ArrayList<ModelClass> modelClasses = new SearchResult().getModelClass(search, imgUrlList);
                 Log.v("response-image-search", modelClasses.size() + "");
-
-                for (ModelClass m : modelClasses) {
-                    Log.v("response-image-search", m.getClaim());
-                }
                 searchHistory.add(modelClasses);
+                searchRepository.setErrorMessage("Search finished");
+                searchRepository.getCurrentSearch().setValue(searchHistory);
             }
-
-            searchRepository.getCurrentSearch().setValue(searchHistory);
         } catch (Exception e) {
             e.printStackTrace();
             searchRepository.setErrorMessage("Your search did not match any claims");
-
             Log.v("response-image", "error");
         }
     }
-
-//    protected MutableLiveData<ArrayList<ModelClass>> getMutableData(){
-//        return data;
-//    }
 
 }

@@ -97,7 +97,7 @@ public class SearchResult implements searchApi {
             m.setReview("Factual Rating:- " + search.claims.get(i).claimReview.get(0).textualRating);
             m.setImageUrl(imgUrlList.get(i));
             m.setWebsiteUrl(search.claims.get(i).claimReview.get(0).url);
-            Log.i("response", "I am in getMyList() and website url is " + search.claims.get(i).claimReview.get(0).url);
+//            Log.i("response", "I am in getMyList() and website url is " + search.claims.get(i).claimReview.get(0).url);
             models.add(m);
         }
         for (ModelClass m : models) {
