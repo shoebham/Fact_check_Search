@@ -38,16 +38,18 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
     @NonNull
     @Override
     public outerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
         ViewHolder viewHolder = new ViewHolder(LayoutInflater
                 .from(parent.getContext())
                 .inflate(R.layout.nested_recycler_view_with_cardview, parent, false));
+//        viewHolder.setIsRecyclable(true);
+        viewHolder.recyclerView.setRecycledViewPool(viewPool);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull outerAdapter.ViewHolder holder, int position) {
         Log.v("response-outer-adapter", "size:" + supermodel.size());
-//        holder.recyclerView.setRecycledViewPool(viewPool);
         for (int i = supermodel.size() - 1; i >= 0; i--) {
             if (position == supermodel.size() - 1 - i) {
                 final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);

@@ -26,7 +26,6 @@ public class innerAdapter extends RecyclerView.Adapter<innerAdapter.ViewHolder> 
     ArrayList<ModelClass> models;
     View view;
     Context context;
-
     public innerAdapter(Context context, ArrayList<ModelClass> models) {
         this.context = context;
         this.models = models;
@@ -40,7 +39,10 @@ public class innerAdapter extends RecyclerView.Adapter<innerAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
+    public void onBindViewHolder(
+            @NonNull ViewHolder holder,
+            @SuppressLint("RecyclerView") final int position) {
+
         holder.mClaim.setText(models.get(position).getClaim());
         Log.v("Recycler", "45" + models.get(position).getClaim());
         holder.mReview.setText(models.get(position).getReview());
@@ -49,10 +51,11 @@ public class innerAdapter extends RecyclerView.Adapter<innerAdapter.ViewHolder> 
         long start = System.currentTimeMillis();
         GlideApp.with(context).applyDefaultRequestOptions(myOptions).load(models.get(position).getImageUrl()).into(holder.mImageView);
         long end = System.currentTimeMillis();
-        view.setOnClickListener(new View.OnClickListener() {
+        holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(models.get(position).getWebsiteUrl()));
+                Intent intent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(models.get(position).getWebsiteUrl()));
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }
