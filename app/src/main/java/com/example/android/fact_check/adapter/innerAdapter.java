@@ -20,12 +20,15 @@ import com.example.android.fact_check.ModelClass;
 import com.example.android.fact_check.R;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class innerAdapter extends RecyclerView.Adapter<innerAdapter.ViewHolder> {
 
     ArrayList<ModelClass> models;
     View view;
     Context context;
+    public AtomicInteger count = new AtomicInteger(0);
+
     public innerAdapter(Context context, ArrayList<ModelClass> models) {
         this.context = context;
         this.models = models;
@@ -34,6 +37,7 @@ public class innerAdapter extends RecyclerView.Adapter<innerAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.v("response-inner-adapter", "count:- " + count.incrementAndGet());
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.inner_recyclerview, parent, false);
         return new ViewHolder(view);
     }

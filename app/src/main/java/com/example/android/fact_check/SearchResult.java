@@ -39,7 +39,6 @@ public class SearchResult implements searchApi {
 
     public SearchResult(Context context) {
         this.context = context;
-        searchState.isSearching = true;
     }
 
     public Search getSearchResult(String searchText, String language, String resultSize) {
@@ -54,23 +53,16 @@ public class SearchResult implements searchApi {
                     @Override
                     public void onResponse(JSONObject response) {
                         if (response.toString().equals("{}")) {
-                            searchState.isSearchValid = false;
-                            searchState.error_message = "your search did not match any claims";
                         } else {
-                            searchState.isSearchValid = true;
                             search = gson.fromJson(response.toString(), Search.class);
                             setSearch(search);
                             getImageResult(imgUrlList);
                         }
-                        searchState.isSearching = false;
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
-                        searchState.isSearchValid = false;
-                        searchState.isSearching = false;
-                        searchState.error_message = "Some unexpected error occurred";
                     }
                 });
         queue.add(jsonObjectRequest);

@@ -22,27 +22,28 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
     ArrayList<String> searchHistory;
     ArrayList<ArrayList<ModelClass>> supermodel;
     RecyclerView.RecycledViewPool viewPool;
+
     public outerAdapter() {
     }
 
     public outerAdapter(Context context,
                         ArrayList<ArrayList<ModelClass>> supermodel, ArrayList<String> searchHistory) {
-        Log.v("response-outer-adapter", "here");
         this.context = context;
 //        this.models = models;
         this.searchHistory = searchHistory;
         this.supermodel = supermodel;
         viewPool = new RecyclerView.RecycledViewPool();
+
     }
 
     @NonNull
     @Override
     public outerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.v("response-outer-adapter", "here");
 
         ViewHolder viewHolder = new ViewHolder(LayoutInflater
                 .from(parent.getContext())
                 .inflate(R.layout.nested_recycler_view_with_cardview, parent, false));
-//        viewHolder.setIsRecyclable(true);
         viewHolder.recyclerView.setRecycledViewPool(viewPool);
         return viewHolder;
     }
@@ -54,6 +55,7 @@ public class outerAdapter extends RecyclerView.Adapter<outerAdapter.ViewHolder> 
             if (position == supermodel.size() - 1 - i) {
                 final LinearLayoutManager layoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
                 layoutManager.setMeasurementCacheEnabled(false);
+                layoutManager.setInitialPrefetchItemCount(5);
                 holder.recyclerView.setLayoutManager(layoutManager);
                 holder.recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                     @Override

@@ -126,7 +126,8 @@ public class ImageSearch extends AsyncTask<Void, Void, Void> {
         searchRepository.setIsUpdating(false);
         try {
             super.onPostExecute(aVoid);
-            ArrayList<ArrayList<ModelClass>> searchHistory = searchRepository.getCurrentSearch().getValue();
+            ArrayList<ArrayList<ModelClass>> searchHistory =
+                    searchRepository.getCurrentSearch().getValue();
             if (searchHistory != null) {
                 Log.v("response-image-search", "HERE");
                 ArrayList<ModelClass> modelClasses = new SearchResult().getModelClass(search, imgUrlList);

@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
     private MainActivityViewModel mMainActivityViewModel;
     private outerAdapter mAdapter;
     private ArrayList<ModelClass> modelClasses;
+    private int lastSize;
+    private int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         mMainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         mMainActivityViewModel.init();
 
+        lastSize = mMainActivityViewModel.getCurrentSearch().getValue().size() - 1;
         mMainActivityViewModel.getCurrentSearch().observe(this,
                 new Observer<ArrayList<ArrayList<ModelClass>>>() {
                     @Override

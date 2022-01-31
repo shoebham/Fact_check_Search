@@ -9,7 +9,6 @@
     app:strokeColor="@android:color/black"
     app:strokeWidth="2dp"
     android:hapticFeedbackEnabled="true"
-
     app:cardElevation="20dp"
     app:cardUseCompatPadding="true">
 
