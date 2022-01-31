@@ -1,6 +1,5 @@
 package com.example.android.fact_check;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -34,7 +33,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<MyHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyHolder holder, @SuppressLint("RecyclerView") final int position) {
+    public void onBindViewHolder(@NonNull MyHolder holder, final int position) {
         RequestOptions myOptions = new RequestOptions()
                 .override(700, 700);
         holder.mClaim.setText(models.get(position).getClaim());
